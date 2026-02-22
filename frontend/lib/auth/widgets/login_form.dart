@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 //import '../view_model/login_view_model.dart';
-import 'package:frontend/auth/view_model/login_view_model.dart';
+import 'package:apk_web_eduflow/auth/view_model/login_view_model.dart';
 
 class LoginForm extends StatefulWidget {
   const LoginForm({super.key});

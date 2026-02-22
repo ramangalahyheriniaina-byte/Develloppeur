@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/auth/view/login.dart';
+import 'package:apk_web_eduflow/auth/view/login.dart';
 import '../layout/main_layout.dart';
 
 // ===============================
 /// NOMS DES ROUTES (App globale)
 // ===============================
 class AppRoutes {
-  //Authentification
-  static const String login = '/login';
+  // Authentification
+  static const String login = '/';
   static const String logout = '/logout';
 
-  //Admin (Layout unique)
+  // Admin (Layout unique)
   static const String admin = '/admin';
 
-  // Prof (à venir)
+  // Prof 
   static const String profHome = '/prof/home';
 
-  //  Étudiant (à venir)
+  // Étudiant 
   static const String etudiantHome = '/etudiant/home';
 }
 
@@ -36,19 +36,27 @@ class AppRouter {
         );
 
     // =====================
-    /// ADMIN (layout unique)
+    /// ADMIN
     // =====================
       case AppRoutes.admin:
         return MaterialPageRoute(
-          builder: (_) => const MainLayout(), // MainLayout décide quelle page afficher
+          builder: (_) => const MainLayout(),
         );
 
     // =====================
-    /// LOGOUT
+    /// PROF
     // =====================
-      case AppRoutes.logout:
+      case AppRoutes.profHome:
         return MaterialPageRoute(
-          builder: (_) => const LoginScreen(),
+          builder: (_) => const MainLayout(),
+        );
+
+    // =====================
+    /// ETUDIANT
+    // =====================
+      case AppRoutes.etudiantHome:
+        return MaterialPageRoute(
+          builder: (_) => const MainLayout(),
         );
 
     // =====================
@@ -56,27 +64,18 @@ class AppRouter {
     // =====================
       default:
         return MaterialPageRoute(
-          builder: (_) => const Scaffold(
-            body: Center(
-              child: Text('Error -> Route non trouvée'),
-            ),
-          ),
+          builder: (_) => const LoginScreen(),
         );
     }
   }
 }
 
 // ===============================
-/// Routes internes au MainLayout (ADMIN)
+/// Routes internes au MainLayout
 // ===============================
 class Routes {
-  // Page par défaut (cours)
   static const String cours = 'cours';
-
-  // Emploi du temps
   static const String programme = 'edt';
-
-  // Dashboard
   static const String dashboard = 'dashboard';
+  static const String logout = '/logout';
 }
-

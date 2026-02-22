@@ -20,7 +20,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-      
+
   backend:
     build:
       context: .
@@ -46,6 +46,23 @@ services:
       - eduflows_network_dev
     command: sh -c "cd /app/backend && npm run dev"
 
+  pedagogie:
+    build:
+      context: ./backend/pedagologie
+      dockerfile: Dockerfile.pedagogie
+    container_name: eduflows_pedagogie_dev
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: "postgresql://${DB_USER:-eduflows_user}:${DB_PASSWORD:-eduflows_password}@postgres:5432/${DB_NAME:-eduflows_db}"
+      BACKEND_CORS_ORIGINS: "http://localhost:3000,http://localhost:8080,http://localhost:8000"
+    ports:
+      - "8000:8000"
+    networks:
+      - eduflows_network_dev
+    command: python run.py
+
   frontend:
     build:
       context: .
@@ -66,4 +83,3 @@ networks:
 volumes:
   postgres_data_dev:
     driver: local
-

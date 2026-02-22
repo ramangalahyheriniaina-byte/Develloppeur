@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  //  Couleurs principales
+  // 🔹 Couleurs principales
   static const Color mainColor = Color(0xFF629EB9);
   static const Color blancColor = Color(0xFFFFFFFF);
   static const Color backgroundColor1 = Color(0xFFA6C0D6);
   static const Color backgroundColor2 = Color(0xFFF8FAFC);
 
-  // Police
+  // 🔹 Police
   static const String fontFamily = "Open Sans";
 
-  //  Light Theme
+  // 🔹 Light Theme
   static final ThemeData lightTheme = ThemeData(
     primaryColor: mainColor,
     scaffoldBackgroundColor: backgroundColor2,

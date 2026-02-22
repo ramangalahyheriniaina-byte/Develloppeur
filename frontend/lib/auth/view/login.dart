@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/auth/widgets/login_form.dart';
+import 'package:apk_web_eduflow/auth/widgets/login_form.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -64,11 +64,12 @@ class LoginScreen extends StatelessWidget {
 
                     const SizedBox(height: 25),
 
-                    Image.asset(
-                      'lib/assets/images/logo.png',
-                      width: 168,
-                      height: 171,
+                    Icon(
+                      Icons.menu_book,
+                      size: 130,
+                      color: Colors.white.withOpacity(0.9),
                     ),
+
 
                     const SizedBox(height: 30),
 
