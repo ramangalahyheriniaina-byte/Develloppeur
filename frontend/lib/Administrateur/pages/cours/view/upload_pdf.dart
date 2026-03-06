@@ -93,7 +93,7 @@ class _UploadProgrammeViewState extends State<UploadProgrammeView> {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text("Bienvenue sur L'analyse IA",
+        title: const Text("Bienvenue sur L' analyse IA",
             style: TextStyle(color: Colors.black87)),
         centerTitle: true,
       ),

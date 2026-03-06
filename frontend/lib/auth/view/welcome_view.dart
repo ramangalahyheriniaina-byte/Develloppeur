@@ -14,49 +14,56 @@ class _WelcomeViewState extends State<WelcomeView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF8AAABF),
+      backgroundColor: const Color(0xFFF8FAFC), //  fond clair moderne
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 60),
         child: Row(
           children: [
-            // PARTIE TEXTE (gauche)
+            // ================= LEFT SIDE (TEXT) =================
             Expanded(
               flex: 5,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  /// TITRE
                   const Text(
                     "EduFlow",
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Color(0xFF1E3A8A), // bleu profond
                       fontSize: 48,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
+
                   const Spacer(flex: 2),
+
+                  /// SLOGAN
                   const Text(
                     "Pour une éducation plus efficace.",
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Color(0xFF1E3A8A),
                       fontSize: 42,
                       fontWeight: FontWeight.w600,
                       height: 1.2,
                     ),
                   ),
+
                   const SizedBox(height: 20),
+
+                  /// DESCRIPTION
                   const Text(
-                    "Eduflow utilise l'IA pour générer automatiquement\nles programmes scolaires.",
+                    "EduFlow utilise l'IA pour générer automatiquement\nles programmes scolaires.",
                     style: TextStyle(
-                      color: Colors.white70,
+                      color: Color(0xFF475569),
                       fontSize: 18,
-                      fontWeight: FontWeight.w400,
                       height: 1.5,
                     ),
                   ),
+
                   const SizedBox(height: 40),
 
-                  // Bouton "Commencer" simplifié
+                  /// BOUTON COMMENCER
                   MouseRegion(
                     cursor: SystemMouseCursors.click,
                     onEnter: (_) => setState(() => _isHovered = true),
@@ -66,22 +73,23 @@ class _WelcomeViewState extends State<WelcomeView> {
                         Navigator.pushNamedAndRemoveUntil(
                           context,
                           '/',
-                              (route) => false,
+                          (route) => false,
                         );
                       },
                       child: AnimatedContainer(
                         duration: const Duration(milliseconds: 200),
                         curve: Curves.easeInOut,
-                        width: _isHovered ? 210 : 200,  // Changement de largeur au lieu de scale
-                        height: _isHovered ? 60 : 55,    // Changement de hauteur au lieu de scale
+                        width: _isHovered ? 210 : 200,
+                        height: _isHovered ? 60 : 55,
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: const Color(0xFF2563EB), // bleu moderne
                           borderRadius: BorderRadius.circular(50),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.black.withOpacity(_isHovered ? 0.15 : 0.1),
-                              blurRadius: _isHovered ? 12 : 8,
-                              offset: const Offset(0, 4),
+                              color: const Color(0xFF2563EB)
+                                  .withOpacity(_isHovered ? 0.4 : 0.25),
+                              blurRadius: _isHovered ? 20 : 12,
+                              offset: const Offset(0, 6),
                             ),
                           ],
                         ),
@@ -92,15 +100,16 @@ class _WelcomeViewState extends State<WelcomeView> {
                               Text(
                                 "Commencer",
                                 style: TextStyle(
-                                  color: Colors.black87,
+                                  color: Colors.white,
                                   fontSize: 20,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
                               SizedBox(width: 10),
                               Text(
                                 "→",
                                 style: TextStyle(
-                                  color: Colors.black87,
+                                  color: Colors.white,
                                   fontSize: 22,
                                 ),
                               ),
@@ -110,12 +119,13 @@ class _WelcomeViewState extends State<WelcomeView> {
                       ),
                     ),
                   ),
+
                   const Spacer(flex: 2),
                 ],
               ),
             ),
 
-            // PARTIE IMAGE (droite)
+            // ================= RIGHT SIDE (IMAGE) =================
             Expanded(
               flex: 5,
               child: Center(
