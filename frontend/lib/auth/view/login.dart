@@ -10,70 +10,104 @@ class LoginScreen extends StatelessWidget {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        color: const Color(0xFF6FA6BC),
+        color: const Color(0xFF5B9BB0),
         child: Stack(
           children: [
-            // cercle gauche bas
+
+            // ========= CERCLE BAS GAUCHE =========
             Positioned(
-              left: -120,
-              bottom: -120,
+              left: -140,
+              bottom: -140,
+              child: Container(
+                width: 380,
+                height: 380,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.12),
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
+
+            Positioned(
+              left: -80,
+              bottom: -80,
+              child: Container(
+                width: 280,
+                height: 280,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.08),
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
+
+            // ========= CERCLE HAUT DROIT =========
+            Positioned(
+              top: -110,
+              right: -110,
               child: Container(
                 width: 300,
                 height: 300,
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.white.withOpacity(0.10),
                   shape: BoxShape.circle,
                 ),
               ),
             ),
 
-            // cercle droit haut
             Positioned(
-              top: -100,
-              right: -100,
+              top: 60,
+              right: -60,
               child: Container(
-                width: 250,
-                height: 250,
+                width: 180,
+                height: 180,
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.08),
+                  color: Colors.white.withOpacity(0.06),
                   shape: BoxShape.circle,
                 ),
               ),
             ),
 
+            // ========= CONTENU =========
             Center(
               child: Transform.translate(
-                offset: const Offset(0, -65),
+                offset: const Offset(0, -50),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+
                     const Align(
                       alignment: Alignment.centerLeft,
                       child: Padding(
-                        padding: EdgeInsets.only(left: 30),
+                        padding: EdgeInsets.only(left: 40),
                         child: Text(
                           "EduFlow",
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 48,
-                            fontWeight: FontWeight.bold,
+                            fontSize: 52,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: -0.5,
                           ),
                         ),
                       ),
                     ),
 
-                    const SizedBox(height: 25),
+                    const SizedBox(height: 40),
 
-                    Icon(
-                      Icons.menu_book,
-                      size: 130,
-                      color: Colors.white.withOpacity(0.9),
+                    // ===== LOGO =====
+                    Image.asset(
+                      'assets/images/logo.png',
+                      width: 90,
+                      fit: BoxFit.contain,
                     ),
 
+                    const SizedBox(height: 50),
 
-                    const SizedBox(height: 30),
-
-                    const LoginForm(),
+                    // ===== FORM LOGIN (fonctionnalité conservée) =====
+                    const SizedBox(
+                      width: 300,
+                      child: LoginForm(),
+                    ),
                   ],
                 ),
               ),

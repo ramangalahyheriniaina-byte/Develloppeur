@@ -263,7 +263,6 @@ class _MainLayoutState extends State<MainLayout> {
   }
 }
 
-// ========== Sidebar améliorée ==========
 class SidebarWithYear extends StatelessWidget {
   final String? anneeEnCours;
   final String userName;
@@ -286,106 +285,110 @@ class SidebarWithYear extends StatelessWidget {
     final coursVM = context.watch<CoursViewModel>();
 
     return Container(
-      width: 280,
+      width: 300,
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF0F3057), Color(0xFF1B6B75)],
+          colors: [
+            Color(0xFF0F3057),
+            Color(0xFF17496A),
+            Color(0xFF1B6B75),
+          ],
         ),
       ),
       child: Column(
         children: [
-          // Header avec infos utilisateur
+
+          /// HEADER
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.fromLTRB(20, 35, 20, 25),
             child: Column(
-              mainAxisSize: MainAxisSize.min,
               children: [
-                Transform.scale(
-                  scale: 1.25,
+
+                /// LOGO
+                SizedBox(
+                  height: 80,
                   child: Image.asset(
-                    'assets/images/logo.png',
-                    width: 180,
-                    height: 170,
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) =>
-                    const Icon(Icons.school_rounded, size: 80, color: Colors.white),
+                    "assets/images/logo.png",
+                    height: 60,
                   ),
                 ),
-                const SizedBox(height: 5),
+
+                const SizedBox(height: 16),
+
                 const Text(
-                  'EduFlow',
+                  "EduFlow",
                   style: TextStyle(
-                    fontFamily: 'OpenSans',
-                    fontSize: 26,
+                    fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
-                    letterSpacing: 0.6,
+                    letterSpacing: 1,
                   ),
                 ),
-                const SizedBox(height: 4),
+
+                const SizedBox(height: 6),
+
                 Text(
-                  'Admin: $userName',
+                  "Admin: $userName",
                   style: TextStyle(
-                    fontFamily: 'OpenSans',
                     fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white.withOpacity(0.8),
-                    letterSpacing: 0.3,
+                    color: Colors.white.withOpacity(0.85),
                   ),
                 ),
+
                 const SizedBox(height: 4),
+
                 Text(
-                  'ID: $userId',
+                  "ID: $userId",
                   style: TextStyle(
                     fontSize: 11,
-                    color: Colors.white.withOpacity(0.5),
+                    color: Colors.white.withOpacity(0.6),
                   ),
                 ),
+
                 if (anneeEnCours != null) ...[
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
+
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.white.withOpacity(0.3), width: 1),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 6,
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.calendar_today, size: 14, color: Colors.white.withOpacity(0.9)),
-                        const SizedBox(width: 6),
-                        Text(
-                          anneeEnCours!,
-                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white.withOpacity(0.95)),
-                        ),
-                      ],
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      anneeEnCours!,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ],
 
-                // Indicateur de statut de configuration
                 if (needsInitialization) ...[
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
+
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.orange.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: Colors.orange.withOpacity(0.5), width: 1),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 6,
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: const [
-                        Icon(Icons.settings, size: 14, color: Colors.orange),
-                        SizedBox(width: 6),
-                        Text(
-                          'Configuration requise',
-                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.orange),
-                        ),
-                      ],
+                    decoration: BoxDecoration(
+                      color: Colors.orange.withOpacity(0.18),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: const Text(
+                      "Configuration requise",
+                      style: TextStyle(
+                        color: Colors.orange,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
+                      ),
                     ),
                   ),
                 ],
@@ -393,104 +396,113 @@ class SidebarWithYear extends StatelessWidget {
             ),
           ),
 
-          // Séparateur
+          /// DIVIDER
           Container(
-            margin: const EdgeInsets.symmetric(horizontal: 24),
+            margin: const EdgeInsets.symmetric(horizontal: 20),
             height: 1,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.transparent, Colors.white.withOpacity(0.3), Colors.transparent],
-              ),
-            ),
+            color: Colors.white.withOpacity(0.1),
           ),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
 
-          // Menu items
+          /// MENU
           Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14),
               child: Column(
                 children: [
-                  _buildMenuItem(
+
+                  _menuItem(
                     context,
-                    title: 'Cours',
-                    icon: Icons.book_rounded,
-                    route: Routes.cours,
-                    navVM: navVM,
-                    isEnabled: !needsInitialization,
-                    disabledTooltip: "Terminez d'abord la configuration",
+                    "Cours",
+                    Icons.book_rounded,
+                    Routes.cours,
+                    navVM,
+                    !needsInitialization,
                   ),
-                  const SizedBox(height: 8),
-                  _buildMenuItem(
+
+                  const SizedBox(height: 10),
+
+                  _menuItem(
                     context,
-                    title: 'Emploi du temps',
-                    icon: Icons.calendar_month_rounded,
-                    route: Routes.programme,
-                    navVM: navVM,
-                    isEnabled: !needsInitialization && coursVM.cours.isNotEmpty,
-                    disabledTooltip: "Créez d'abord des cours",
+                    "Emploi du temps",
+                    Icons.calendar_month_rounded,
+                    Routes.programme,
+                    navVM,
+                    !needsInitialization && coursVM.cours.isNotEmpty,
                   ),
-                  const SizedBox(height: 8),
-                  _buildMenuItem(
+
+                  const SizedBox(height: 10),
+
+                  _menuItem(
                     context,
-                    title: 'Dashboard',
-                    icon: Icons.dashboard_rounded,
-                    route: Routes.dashboard,
-                    navVM: navVM,
-                    isEnabled: true,
+                    "Dashboard",
+                    Icons.dashboard_rounded,
+                    Routes.dashboard,
+                    navVM,
+                    true,
                   ),
                 ],
               ),
             ),
           ),
 
-          // Footer
-          Container(
-            padding: const EdgeInsets.all(16),
+          /// FOOTER
+          Padding(
+            padding: const EdgeInsets.all(18),
             child: Column(
               children: [
+
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.white.withOpacity(0.15)),
+                    color: Colors.white.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.08),
+                    ),
                   ),
                   child: Row(
                     children: [
+
                       Container(
-                        width: 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF22C55E),
+                        width: 10,
+                        height: 10,
+                        decoration: const BoxDecoration(
+                          color: Color(0xFF22C55E),
                           shape: BoxShape.circle,
-                          boxShadow: [BoxShadow(color: const Color(0xFF22C55E).withOpacity(0.5), blurRadius: 8, spreadRadius: 2)],
                         ),
                       ),
-                      const SizedBox(width: 12),
+
+                      const SizedBox(width: 10),
+
                       Expanded(
                         child: Text(
-                          needsInitialization ? 'Configuration en cours...' : 'System Online',
-                          style: TextStyle(
-                            color: needsInitialization ? Colors.orange : Colors.white.withOpacity(0.9),
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
+                          needsInitialization
+                              ? "Configuration en cours..."
+                              : "System Online",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
                           ),
-                          overflow: TextOverflow.ellipsis,
                         ),
-                      ),
+                      )
                     ],
                   ),
                 ),
+
                 const SizedBox(height: 12),
-                _buildMenuItem(
+
+                _menuItem(
                   context,
-                  title: 'Déconnexion',
-                  icon: Icons.logout_rounded,
-                  route: Routes.logout,
-                  navVM: navVM,
-                  isEnabled: true,
+                  "Déconnexion",
+                  Icons.logout_rounded,
+                  Routes.logout,
+                  navVM,
+                  true,
                   isDanger: true,
                   customOnTap: onLogout,
                 ),
@@ -502,91 +514,80 @@ class SidebarWithYear extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuItem(
-      BuildContext context, {
-        required String title,
-        required IconData icon,
-        required String route,
-        required NavigationViewModel navVM,
-        required bool isEnabled,
-        String disabledTooltip = "",
+  Widget _menuItem(
+      BuildContext context,
+      String title,
+      IconData icon,
+      String route,
+      NavigationViewModel navVM,
+      bool enabled, {
         bool isDanger = false,
         VoidCallback? customOnTap,
       }) {
-    final isActive = navVM.currentRoute == route && isEnabled;
 
-    return Tooltip(
-      message: isEnabled ? "" : disabledTooltip,
+    final isActive = navVM.currentRoute == route;
+
+    return InkWell(
+      onTap: enabled
+          ? () {
+        if (customOnTap != null) {
+          customOnTap();
+        } else {
+          navVM.setCurrentRoute(route);
+        }
+      }
+          : null,
+      borderRadius: BorderRadius.circular(14),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        curve: Curves.easeInOut,
+        padding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
         decoration: BoxDecoration(
           color: isActive
-              ? Colors.white.withOpacity(0.2)
-              : (isEnabled ? Colors.transparent : Colors.white.withOpacity(0.05)),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: isActive ? Colors.white.withOpacity(0.3) : Colors.transparent, width: 1.5),
-          boxShadow: isActive
-              ? [
-            BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4)),
-          ]
-              : [],
+              ? Colors.white.withOpacity(0.18)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(14),
+          border: isActive
+              ? Border.all(
+            color: Colors.white.withOpacity(0.25),
+            width: 1,
+          )
+              : null,
         ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: isEnabled ? () {
-              if (customOnTap != null) {
-                customOnTap();
-              } else {
-                navVM.setCurrentRoute(route);
-              }
-            } : null,
-            borderRadius: BorderRadius.circular(16),
-            splashColor: Colors.white.withOpacity(0.1),
-            highlightColor: Colors.white.withOpacity(0.05),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: isActive
-                          ? Colors.white.withOpacity(0.25)
-                          : (isDanger ? const Color(0xFFEF4444).withOpacity(0.15) : Colors.white.withOpacity(0.1)),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(
-                      icon,
-                      size: 22,
-                      color: isEnabled
-                          ? (isDanger ? const Color(0xFFFEE2E2) : Colors.white)
-                          : Colors.white.withOpacity(0.4),
-                    ),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Text(
-                      title,
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
-                        color: isEnabled ? Colors.white : Colors.white.withOpacity(0.4),
-                        letterSpacing: 0.2,
-                      ),
-                    ),
-                  ),
-                  if (isActive)
-                    Container(
-                      width: 6,
-                      height: 6,
-                      decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                    ),
-                ],
+        child: Row(
+          children: [
+
+            Icon(
+              icon,
+              color: isDanger ? Colors.red : Colors.white,
+              size: 22,
+            ),
+
+            const SizedBox(width: 14),
+
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  color: enabled
+                      ? Colors.white
+                      : Colors.white.withOpacity(0.4),
+                  fontSize: 14,
+                  fontWeight:
+                  isActive ? FontWeight.w600 : FontWeight.w500,
+                ),
               ),
             ),
-          ),
+
+            if (isActive)
+              const Icon(
+                Icons.circle,
+                size: 7,
+                color: Colors.white,
+              ),
+          ],
         ),
       ),
     );
