@@ -291,9 +291,9 @@ class SidebarWithYear extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Color(0xFF0F3057),
-            Color(0xFF17496A),
-            Color(0xFF1B6B75),
+            Color(0xFF4F8CA8),
+            Color(0xFF629EB9),
+            Color(0xFF76B0C8),
           ],
         ),
       ),
