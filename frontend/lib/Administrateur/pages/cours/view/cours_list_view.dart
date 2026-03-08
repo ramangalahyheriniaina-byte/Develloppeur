@@ -1,4 +1,5 @@
 // lib/Administrateur/pages/Cours/view/cours_list_view.dart
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -15,16 +16,14 @@ class CoursListView extends StatefulWidget {
 }
 
 class _CoursListViewState extends State<CoursListView> {
-  // 🎯 CLÉS POUR GARDER L'ÉTAT DES EXPANSION TILES
   final Map<int, bool> _expandedClasses = {};
 
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // 🔄 Charger les données après la première frame
-      final coursViewModel = context.read<CoursViewModel>();
-      coursViewModel.loadInitialData();
+      context.read<CoursViewModel>().loadInitialData();
     });
   }
 
@@ -34,431 +33,650 @@ class _CoursListViewState extends State<CoursListView> {
       builder: (context, viewModel, _) {
         if (viewModel.isLoading) {
           return const Scaffold(
-            backgroundColor: Color(0xFFF9FAFB),
-            body: Center(
-              child: CircularProgressIndicator(color: Color(0xFF629EB9)),
-            ),
+            body: Center(child: CircularProgressIndicator()),
           );
         }
 
         return Scaffold(
-          backgroundColor: const Color(0xFFF9FAFB),
-          body: Row(
-            children: [
-              // PANNEAU GAUCHE - Liste des profs
-              Container(
-                width: 350,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: const Offset(2, 0),
+          backgroundColor: const Color(0xFFF5F7FA),
+          body: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  /// HEADER
+                  const SizedBox(height: 16),
+                  Text(
+                    'Tableau de Bord de Répartition des Matières',
+                    style: TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF1A1F36),
                     ),
-                  ],
-                ),
-                child: _buildPanneauProfs(context, viewModel),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    viewModel.anneeScolaire?.displayName ?? "2026-2027",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFF4A5568),
+                    ),
+                  ),
+                  Text(
+                    '${viewModel.totalClasses} classes • ${viewModel.totalMatieres} matières',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Color(0xFF718096),
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+
+                  /// STATS ROW
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        flex: 1,
+                        child: _buildStatsCard(viewModel),
+                      ),
+                      const SizedBox(width: 24),
+                      Expanded(
+                        flex: 2,
+                        child: _buildProfessorsSection(context, viewModel),
+                      ),
+                      const SizedBox(width: 24),
+                      Expanded(
+                        flex: 1,
+                        child: _buildProfsCountCard(viewModel),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 32),
+
+                  /// PROGRAMMES CARDS - En grille 2 colonnes
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      return Wrap(
+                        spacing: 20,
+                        runSpacing: 20,
+                        children: viewModel.classes.map((classe) {
+                          return SizedBox(
+                            width: (constraints.maxWidth - 20) / 2,
+                            child: _buildProgramCard(
+                              context,
+                              classe,
+                              viewModel,
+                            ),
+                          );
+                        }).toList(),
+                      );
+                    },
+                  ),
+
+                  const SizedBox(height: 40),
+
+                  /// FOOTER
+                  Center(
+                    child: Text(
+                      '© Copyright 2026 - 2027 • EduFlow Platform version 2.0.1 • All rights reserved • Contact Support',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFFA0AEC0),
+                        letterSpacing: 0.3,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                ],
               ),
-
-              // PANNEAU DROIT - Classes et matières
-              Expanded(
-                child: CustomScrollView(
-                  slivers: [
-                    // APP BAR
-                    SliverAppBar(
-                      expandedHeight: 200,
-                      pinned: true,
-                      backgroundColor: const Color(0xFF629EB9),
-                      flexibleSpace: FlexibleSpaceBar(
-                        title: const Text(
-                          'Répartition des Matières',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        background: Container(
-                          decoration: const BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [Color(0xFF629EB9), Color(0xFF4A7C96)],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                          ),
-                          child: Center(
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 60),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    viewModel.anneeScolaire?.displayName ?? '',
-                                    style: const TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    '${viewModel.totalClasses} classes • ${viewModel.totalMatieres} matières',
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.white70,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    // STATISTIQUES
-                    SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.all(24),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: _buildStatCard(
-                                icon: Icons.check_circle,
-                                label: 'Avec prof',
-                                value: '${viewModel.matieresAvecProf}',
-                                color: const Color(0xFF10B981),
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: _buildStatCard(
-                                icon: Icons.pending,
-                                label: 'Sans prof',
-                                value: '${viewModel.matieresSansProf}',
-                                color: const Color(0xFFF59E0B),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    // LISTE DES CLASSES
-                    SliverPadding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
-                      sliver: SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                              (context, index) {
-                            final classe = viewModel.classes[index];
-                            return _buildClasseCard(context, classe, viewModel);
-                          },
-                          childCount: viewModel.classes.length,
-                        ),
-                      ),
-                    ),
-
-                    const SliverToBoxAdapter(child: SizedBox(height: 24)),
-                  ],
-                ),
-              ),
-            ],
+            ),
           ),
         );
       },
     );
   }
 
-  // ========== PANNEAU GAUCHE - GESTION PROFS ==========
-  Widget _buildPanneauProfs(BuildContext context, CoursViewModel viewModel) {
-    return Column(
-      children: [
-        // Header
-        Container(
-          padding: const EdgeInsets.all(24),
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF629EB9), Color(0xFF4A7C96)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
+  /// STATS CARD
+  Widget _buildStatsCard(CoursViewModel viewModel) {
+    final totalMatieres = viewModel.totalMatieres;
+    final avecProf = viewModel.matieresAvecProf;
+    final sansProf = viewModel.matieresSansProf;
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.9),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Color(0xFFE2E8F0), width: 1),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          _buildStatRing(
+            number: '$avecProf',
+            label: 'Avec prof',
+            icon: Icons.person,
+            progress: totalMatieres > 0 ? avecProf / totalMatieres : 0,
+            ringColor: Color(0xFF48BB78),
+            backgroundColor: Color(0xFFF0FFF4),
           ),
-          child: Column(
+          const SizedBox(width: 8),
+          _buildStatRing(
+            number: '$sansProf',
+            label: 'Sans prof',
+            icon: Icons.more_horiz,
+            progress: totalMatieres > 0 ? sansProf / totalMatieres : 0,
+            ringColor: Color(0xFFED8936),
+            backgroundColor: Color(0xFFFFF7E5),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatRing({
+    required String number,
+    required String label,
+    required IconData icon,
+    required double progress,
+    required Color ringColor,
+    required Color backgroundColor,
+  }) {
+    return Expanded(
+      child: Column(
+        children: [
+          Stack(
+            alignment: Alignment.center,
             children: [
-              Row(
-                children: const [
-                  Icon(Icons.people, color: Colors.white, size: 28),
-                  SizedBox(width: 12),
-                  Text(
-                    'Professeurs',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(12),
+              SizedBox(
+                width: 80,
+                height: 80,
+                child: CircularProgressIndicator(
+                  value: 1.0,
+                  strokeWidth: 3,
+                  backgroundColor: Color(0xFFE2E8F0),
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.transparent),
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      '${viewModel.profs.length}',
-                      style: const TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    const Text(
-                      'Profs',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.white70,
-                      ),
-                    ),
-                  ],
+              ),
+              SizedBox(
+                width: 80,
+                height: 80,
+                child: CircularProgressIndicator(
+                  value: progress,
+                  strokeWidth: 3,
+                  backgroundColor: Colors.transparent,
+                  valueColor: AlwaysStoppedAnimation<Color>(ringColor),
+                ),
+              ),
+              Container(
+                width: 50,
+                height: 50,
+                decoration: BoxDecoration(
+                  color: backgroundColor,
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Icon(
+                    icon,
+                    color: ringColor,
+                    size: 24,
+                  ),
                 ),
               ),
             ],
           ),
-        ),
-
-        // Bouton ajouter
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: () => _showAjouterProfDialog(context, viewModel),
-              icon: const Icon(Icons.person_add),
-              label: const Text('Ajouter un prof'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF629EB9),
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
+          const SizedBox(height: 8),
+          Text(
+            number,
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF2D3748),
             ),
           ),
-        ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              color: Color(0xFF718096),
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-        // Liste des profs avec animation
-        Expanded(
-          child: viewModel.profs.isEmpty
-              ? Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                Icon(Icons.person_off, size: 64, color: Color(0xFF9CA3AF)),
-                SizedBox(height: 16),
-                Text(
-                  'Aucun professeur',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Color(0xFF6B7280),
+  /// PROFESSORS SECTION
+  Widget _buildProfessorsSection(BuildContext context, CoursViewModel viewModel) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.9),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Color(0xFFE2E8F0), width: 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.people_outline,
+                      color: Color(0xFF4A5568),
+                      size: 20,
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      'Professeurs',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF2D3748),
+                      ),
+                    ),
+                  ],
+                ),
+                _buildAddProfButton(context, viewModel),
+              ],
+            ),
+          ),
+          const Divider(height: 1, color: Color(0xFFE2E8F0)),
+
+          // Table Header
+          Container(
+            color: Color(0xFFF7FAFC),
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+            child: Row(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: Row(
+                    children: [
+                      Text(
+                        'Nom du Professeur',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF4A5568),
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        child: GestureDetector(
+                          onTap: () {
+                            // Logique de tri à implémenter
+                          },
+                          child: Icon(Icons.unfold_more, size: 14, color: Color(0xFFA0AEC0)),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                SizedBox(height: 8),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 32),
+                Expanded(
+                  flex: 1,
+                  child: Row(
+                    children: [
+                      Text(
+                        'Statut des Cours',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF4A5568),
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      MouseRegion(
+                        cursor: SystemMouseCursors.click,
+                        child: GestureDetector(
+                          onTap: () {
+                            // Logique de tri à implémenter
+                          },
+                          child: Icon(Icons.unfold_more, size: 14, color: Color(0xFFA0AEC0)),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  width: 70,
                   child: Text(
-                    'Ajoutez des profs pour commencer les affectations',
-                    textAlign: TextAlign.center,
+                    'Actions',
                     style: TextStyle(
-                      fontSize: 13,
-                      color: Color(0xFF9CA3AF),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF4A5568),
                     ),
                   ),
                 ),
               ],
             ),
-          )
-              : AnimatedList(
-            key: ValueKey(viewModel.profs.length),
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            initialItemCount: viewModel.profs.length,
-            itemBuilder: (context, index, animation) {
-              if (index >= viewModel.profs.length) {
-                return const SizedBox.shrink();
-              }
+          ),
+          const Divider(height: 1, color: Color(0xFFE2E8F0)),
 
-              final prof = viewModel.profs[index];
-              final nbCours = viewModel.cours
-                  .where((c) => c.idProf == prof.idProf)
-                  .length;
-
-              // 🎨 ANIMATION DE SLIDE + FADE
-              return SlideTransition(
-                position: animation.drive(
-                  Tween<Offset>(
-                    begin: const Offset(-1, 0),
-                    end: Offset.zero,
-                  ).chain(CurveTween(curve: Curves.easeOutCubic)),
+          // Professor Rows
+          if (viewModel.profs.isEmpty)
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: Center(
+                child: Column(
+                  children: [
+                    Icon(Icons.person_off, size: 48, color: Color(0xFFCBD5E0)),
+                    const SizedBox(height: 12),
+                    Text(
+                      'Aucun professeur',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF718096),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ),
-                child: FadeTransition(
-                  opacity: animation,
-                  child: Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: _ProfCard(
-                      prof: prof,
-                      nbCours: nbCours,
-                      onDelete: () => _showSupprimerProfDialog(
-                        context,
-                        prof,
-                        viewModel,
+              ),
+            )
+          else
+            ...viewModel.profs.map((prof) => _buildProfessorRow(prof, viewModel, context)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProfessorRow(Prof prof, CoursViewModel viewModel, BuildContext context) {
+    final nbCours = viewModel.cours
+        .where((c) => c.idProf == prof.idProf)
+        .length;
+
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(color: Color(0xFFEDF2F7), width: 1),
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Expanded(
+              flex: 2,
+              child: Row(
+                children: [
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: Color(0xFFEDF2F7),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Center(
+                      child: Text(
+                        prof.nomProf.isNotEmpty ? prof.nomProf[0].toUpperCase() : '?',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Color(0xFF4A5568),
+                        ),
                       ),
                     ),
                   ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      prof.nomProf,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF2D3748),
+                        fontWeight: FontWeight.w500,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              flex: 1,
+              child: Text(
+                nbCours == 0
+                    ? 'Aucun cours'
+                    : '$nbCours cours affecté${nbCours > 1 ? "s" : ""}',
+                style: TextStyle(
+                  fontSize: 13,
+                  color: nbCours > 0 ? Color(0xFF2D3748) : Color(0xFFA0AEC0),
+                  fontWeight: FontWeight.w500,
                 ),
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildStatCard({
-    required IconData icon,
-    required String label,
-    required String value,
-    required Color color,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Icon(icon, size: 32, color: color),
-          const SizedBox(height: 12),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF111827),
+              ),
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Color(0xFF6B7280),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildClasseCard(BuildContext context, Classe classe, CoursViewModel viewModel) {
-    final totalHeures = viewModel.getTotalHeuresClasse(classe);
-
-    // 🎯 Récupérer ou initialiser l'état d'expansion
-    _expandedClasses.putIfAbsent(classe.idClasse!, () => false);
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 2),
+            SizedBox(
+              width: 70,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Color(0xFFE2E8F0), width: 1),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.edit_outlined,
+                          color: Color(0xFF718096),
+                          size: 16,
+                        ),
+                        onPressed: () {
+                          // À implémenter : modifier professeur
+                        },
+                        padding: EdgeInsets.all(6),
+                        constraints: const BoxConstraints(),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  MouseRegion(
+                    cursor: SystemMouseCursors.click,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Color(0xFFE2E8F0), width: 1),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.delete_outline,
+                          color: Color(0xFFF56565),
+                          size: 16,
+                        ),
+                        onPressed: () => _showSupprimerProfDialog(
+                          context,
+                          prof,
+                          viewModel,
+                        ),
+                        padding: EdgeInsets.all(6),
+                        constraints: const BoxConstraints(),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
-        child: Theme(
-          data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-          child: ExpansionTile(
-            // 🎯 CLÉ UNIQUE POUR PRÉSERVER L'ÉTAT
-            key: ValueKey('classe_${classe.idClasse}'),
-            initiallyExpanded: _expandedClasses[classe.idClasse!]!,
-            onExpansionChanged: (expanded) {
-              setState(() {
-                _expandedClasses[classe.idClasse!] = expanded;
-              });
-            },
-            leading: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF629EB9), Color(0xFF4A7C96)],
-                ),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Icon(Icons.class_, color: Colors.white, size: 24),
-            ),
-            title: Text(
-              classe.nomClasse,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF111827),
-              ),
-            ),
-            subtitle: Padding(
-              padding: const EdgeInsets.only(top: 4),
-              child: Text(
-                '${classe.matieres?.length ?? 0} matières • $totalHeures heures totales',
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Color(0xFF6B7280),
-                ),
-              ),
-            ),
+      ),
+    );
+  }
+
+  Widget _buildAddProfButton(BuildContext context, CoursViewModel viewModel) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () => _showAjouterProfDialog(context, viewModel),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: Color(0xFF2D7A8F),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
             children: [
-              const Divider(),
-              if (classe.matieres == null || classe.matieres!.isEmpty)
-                const Padding(
-                  padding: EdgeInsets.all(24),
-                  child: Text(
-                    'Aucune matière',
-                    style: TextStyle(color: Color(0xFF9CA3AF)),
-                  ),
-                )
-              else
-                ListView.separated(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  padding: const EdgeInsets.all(16),
-                  itemCount: classe.matieres!.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 8),
-                  itemBuilder: (context, index) {
-                    final matiere = classe.matieres![index];
-                    return _MatiereCard(
-                      key: ValueKey('matiere_${matiere.idMatiere}'),
-                      matiere: matiere,
-                      viewModel: viewModel,
-                      onAffecterProf: () => _showAffecterProfDialog(
-                        context,
-                        matiere,
-                        viewModel,
+              Text(
+                'Ajouter un Prof',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Icon(
+                Icons.add,
+                color: Colors.white,
+                size: 16,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// PROFS COUNT CARD
+  Widget _buildProfsCountCard(CoursViewModel viewModel) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 15),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.9),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Color(0xFFE2E8F0), width: 1),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            '${viewModel.profs.length}',
+            style: TextStyle(
+              fontSize: 56,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF2D3748),
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'Profs',
+            style: TextStyle(
+              fontSize: 14,
+              color: Color(0xFF718096),
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// PROGRAM CARD - Avec effet de curseur
+  Widget _buildProgramCard(
+      BuildContext context,
+      Classe classe,
+      CoursViewModel viewModel) {
+    _expandedClasses.putIfAbsent(classe.idClasse!, () => false);
+    final totalHeures = viewModel.getTotalHeuresClasse(classe);
+    final nbMatieres = classe.matieres?.length ?? 0;
+
+    final matieresAvecProf = classe.matieres?.where((m) =>
+    viewModel.getCoursForMatiere(m.idMatiere!) != null
+    ).length ?? 0;
+    final progress = nbMatieres > 0 ? matieresAvecProf / nbMatieres : 0.0;
+
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            _expandedClasses[classe.idClasse!] = !_expandedClasses[classe.idClasse!]!;
+          });
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.9),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Color(0xFFE2E8F0), width: 1),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Programme ${classe.nomClasse}',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF2D3748),
                       ),
-                    );
-                  },
+                    ),
+                    const SizedBox(height: 12),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: LinearProgressIndicator(
+                        value: progress,
+                        minHeight: 8,
+                        backgroundColor: Color(0xFFEDF2F7),
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          Color(0xFF2C3E50),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      '$nbMatieres matières • $totalHeures heures totales',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF718096),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    MouseRegion(
+                      cursor: SystemMouseCursors.click,
+                      child: Text(
+                        'Full list',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Color(0xFF2D7A8F),
+                          fontWeight: FontWeight.w500,
+                          decoration: TextDecoration.underline,
+                          decorationColor: Color(0xFF2D7A8F).withOpacity(0.3),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              if (_expandedClasses[classe.idClasse!]! && (classe.matieres?.isNotEmpty ?? false))
+                Container(
+                  color: Color(0xFFF7FAFC),
+                  child: Column(
+                    children: [
+                      const Divider(height: 1, color: Color(0xFFE2E8F0)),
+                      ...classe.matieres!.map((matiere) =>
+                          _buildMatiereCard(matiere, viewModel, context)
+                      ),
+                    ],
+                  ),
                 ),
             ],
           ),
@@ -467,7 +685,85 @@ class _CoursListViewState extends State<CoursListView> {
     );
   }
 
-  // ========== DIALOGUES ==========
+  /// MATIERE CARD - Avec effet de curseur sur les éléments interactifs
+  Widget _buildMatiereCard(
+      Matiere matiere,
+      CoursViewModel viewModel,
+      BuildContext context) {
+    final cours = viewModel.getCoursForMatiere(matiere.idMatiere!);
+    final hasProf = cours != null;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(color: Color(0xFFEEEEEE), width: 1),
+        ),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  matiere.nomMatiere,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF333333),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '${matiere.heureTotale}h',
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Color(0xFF777777),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: hasProf ? Color(0xFFE3F2F5) : Color(0xFFFEF5E7),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              hasProf
+                  ? viewModel.getProfById(cours.idProf)?.nomProf ?? "Prof"
+                  : "Sans prof",
+              style: TextStyle(
+                fontSize: 10,
+                color: hasProf ? Color(0xFF2D7A8F) : Color(0xFFB8860B),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: IconButton(
+              icon: Icon(
+                Icons.person_add,
+                color: hasProf ? Color(0xFF2D7A8F) : Color(0xFF2D7A8F),
+                size: 18,
+              ),
+              onPressed: () {
+                _showAffecterProfDialog(context, matiere, viewModel);
+              },
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// DIALOGUES (inchangés)
   void _showAjouterProfDialog(BuildContext context, CoursViewModel viewModel) {
     final controller = TextEditingController();
     bool isLoading = false;
@@ -479,7 +775,7 @@ class _CoursListViewState extends State<CoursListView> {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: Row(
             children: const [
-              Icon(Icons.person_add, color: Color(0xFF629EB9)),
+              Icon(Icons.person_add, color: Color(0xFF2D7A8F)),
               SizedBox(width: 12),
               Text('Ajouter un professeur'),
             ],
@@ -508,9 +804,7 @@ class _CoursListViewState extends State<CoursListView> {
               child: const Text('Annuler'),
             ),
             ElevatedButton(
-              onPressed: isLoading
-                  ? null
-                  : () async {
+              onPressed: isLoading ? null : () async {
                 if (controller.text.trim().isNotEmpty) {
                   setDialogState(() => isLoading = true);
                   await viewModel.ajouterProf(controller.text.trim());
@@ -518,7 +812,7 @@ class _CoursListViewState extends State<CoursListView> {
                 }
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF629EB9),
+                backgroundColor: const Color(0xFF2D7A8F),
               ),
               child: isLoading
                   ? const SizedBox(
@@ -619,7 +913,7 @@ class _CoursListViewState extends State<CoursListView> {
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.normal,
-                color: Color(0xFF629EB9),
+                color: Color(0xFF2D7A8F),
               ),
             ),
           ],
@@ -638,7 +932,7 @@ class _CoursListViewState extends State<CoursListView> {
               ),
               const SizedBox(height: 8),
               const Text(
-                'Veuillez d\'abord ajouter des professeurs dans le panneau de gauche.',
+                'Veuillez d\'abord ajouter des professeurs.',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
               ),
@@ -651,7 +945,7 @@ class _CoursListViewState extends State<CoursListView> {
                 icon: const Icon(Icons.person_add),
                 label: const Text('Ajouter un prof'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF629EB9),
+                  backgroundColor: const Color(0xFF2D7A8F),
                 ),
               ),
             ],
@@ -664,14 +958,13 @@ class _CoursListViewState extends State<CoursListView> {
               final nbCours = viewModel.cours
                   .where((c) => c.idProf == prof.idProf)
                   .length;
-
               return ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: const Color(0xFF629EB9).withOpacity(0.1),
+                  backgroundColor: const Color(0xFF2D7A8F).withOpacity(0.1),
                   child: Text(
                     prof.nomProf[0].toUpperCase(),
                     style: const TextStyle(
-                      color: Color(0xFF629EB9),
+                      color: Color(0xFF2D7A8F),
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -707,148 +1000,6 @@ class _CoursListViewState extends State<CoursListView> {
             child: const Text('Annuler'),
           ),
         ],
-      ),
-    );
-  }
-}
-
-// ========== WIDGETS STATEFUL ==========
-
-/// Widget pour une carte de prof
-class _ProfCard extends StatelessWidget {
-  final Prof prof;
-  final int nbCours;
-  final VoidCallback onDelete;
-
-  const _ProfCard({
-    required this.prof,
-    required this.nbCours,
-    required this.onDelete,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFFF9FAFB),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
-      ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 8,
-        ),
-        leading: Hero(
-          tag: 'prof_${prof.idProf}',
-          child: CircleAvatar(
-            backgroundColor: const Color(0xFF629EB9).withOpacity(0.1),
-            child: Text(
-              prof.nomProf[0].toUpperCase(),
-              style: const TextStyle(
-                color: Color(0xFF629EB9),
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ),
-        title: Text(
-          prof.nomProf,
-          style: const TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF111827),
-          ),
-        ),
-        subtitle: Padding(
-          padding: const EdgeInsets.only(top: 4),
-          child: Text(
-            '$nbCours cours affecté${nbCours > 1 ? "s" : ""}',
-            style: const TextStyle(
-              fontSize: 13,
-              color: Color(0xFF6B7280),
-            ),
-          ),
-        ),
-        trailing: IconButton(
-          icon: const Icon(Icons.delete_outline, color: Color(0xFFEF4444)),
-          onPressed: onDelete,
-        ),
-      ),
-    );
-  }
-}
-
-/// Widget pour une carte de matière (SANS ICÔNE)
-class _MatiereCard extends StatelessWidget {
-  final Matiere matiere;
-  final CoursViewModel viewModel;
-  final VoidCallback onAffecterProf;
-
-  const _MatiereCard({
-    Key? key,
-    required this.matiere,
-    required this.viewModel,
-    required this.onAffecterProf,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final cours = viewModel.getCoursForMatiere(matiere.idMatiere!);
-    final hasProf = cours != null;
-
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFFF9FAFB),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: hasProf
-              ? const Color(0xFF10B981).withOpacity(0.3)
-              : const Color(0xFFE5E7EB),
-          width: 1.5,
-        ),
-      ),
-      child: ListTile(
-        // ✅ SUPPRESSION DE L'ICÔNE
-        // leading: Icon(...)  ← Supprimé
-
-        title: Text(
-          matiere.nomMatiere,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF111827),
-          ),
-        ),
-        subtitle: Padding(
-          padding: const EdgeInsets.only(top: 4),
-          child: Text(
-            hasProf
-                ? '${viewModel.getProfById(cours.idProf)?.nomProf ?? "Prof inconnu"} • ${matiere.heureTotale}h'
-                : '${matiere.heureTotale}h • Pas de prof assigné',
-            style: TextStyle(
-              fontSize: 13,
-              color: hasProf ? const Color(0xFF10B981) : const Color(0xFF6B7280),
-              fontWeight: hasProf ? FontWeight.w500 : FontWeight.normal,
-            ),
-          ),
-        ),
-        trailing: hasProf
-            ? Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.check_circle, color: Color(0xFF10B981), size: 20),
-            const SizedBox(width: 4),
-            IconButton(
-              icon: const Icon(Icons.edit, color: Color(0xFF629EB9), size: 20),
-              onPressed: onAffecterProf,
-            ),
-          ],
-        )
-            : IconButton(
-          icon: const Icon(Icons.person_add, color: Color(0xFF629EB9)),
-          onPressed: onAffecterProf,
-        ),
       ),
     );
   }
