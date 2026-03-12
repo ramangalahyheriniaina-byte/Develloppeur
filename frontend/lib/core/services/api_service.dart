@@ -12,10 +12,9 @@ class ApiService {
   static const String baseUrl = 'http://localhost:8000'; // FastAPI pédagogie
   static const String apiVersion = '/api/v1';
 
-  // Stockage du token (vous pouvez adapter avec SharedPreferences si besoin)
+  // Stockage du token
   String? _token;
 
-  // Méthode pour définir le token après login
   void setToken(String token) {
     _token = token;
     if (kDebugMode) {
@@ -23,19 +22,16 @@ class ApiService {
     }
   }
 
-  // Méthode pour récupérer le token depuis LoginViewModel
   void setTokenFromLogin(String? token) {
     if (token != null) {
       _token = token;
     }
   }
 
-  // Clear token (logout)
   void clearToken() {
     _token = null;
   }
 
-  // Headers avec token JWT
   Map<String, String> _getHeaders() {
     final headers = {
       'Content-Type': 'application/json',
@@ -49,7 +45,6 @@ class ApiService {
     return headers;
   }
 
-  // Méthodes HTTP génériques
   Future<dynamic> get(String endpoint, {Map<String, dynamic>? queryParams}) async {
     try {
       Uri uri = Uri.parse('$baseUrl$apiVersion$endpoint');
@@ -67,16 +62,9 @@ class ApiService {
 
   Future<dynamic> post(String endpoint, Map<String, dynamic> data) async {
     try {
-      // ⚠️ AJOUTEZ CES LIGNES DE DEBUG
       final fullUrl = '$baseUrl$apiVersion$endpoint';
       print('🌐 POST URL construite: $fullUrl');
       print('📦 POST Data: $data');
-      print('🔍 Endpoint reçu: "$endpoint"');
-
-      // Vérifiez que endpoint ne contient pas :1
-      if (endpoint.contains(':')) {
-        print('⚠️ ATTENTION: endpoint contient ":" -> $endpoint');
-      }
 
       final response = await http.post(
         Uri.parse(fullUrl),
@@ -85,7 +73,6 @@ class ApiService {
       );
 
       print('📡 POST Response Status: ${response.statusCode}');
-      print('📡 POST Response Body: ${response.body}');
 
       return _handleResponse(response);
     } catch (e) {
@@ -122,70 +109,66 @@ class ApiService {
   }
 
   Future<dynamic> patch(String endpoint, Map<String, dynamic> data) async {
-  try {
-    // ⭐ AJOUTE CES 3 LIGNES DE LOG
-    final fullUrl = '$baseUrl$apiVersion$endpoint';
-    print('🌐 PATCH URL construite: $fullUrl');
-    print('📦 PATCH Data: $data');
-
-    final response = await http.patch(
-      Uri.parse(fullUrl),
-      headers: _getHeaders(),
-      body: jsonEncode(data),
-    );
-
-    print('📡 PATCH Response Status: ${response.statusCode}');
-    
-    return _handleResponse(response);
-  } catch (e) {
-    print('❌ PATCH Error: $e');
-    throw Exception('Erreur PATCH $endpoint: $e');
-  }
-}
-  // Gestion des réponses
-  // Dans frontend/lib/core/services/api_service.dart
-  dynamic _handleResponse(http.Response response) {
-  print('📡 Status: ${response.statusCode}');
-  
-  if (response.statusCode >= 200 && response.statusCode < 300) {
-    if (response.body.isEmpty) {
-      print('✅ Empty response body');
-      return {};
-    }
-
     try {
-      final decoded = jsonDecode(response.body);
-      print('📦 Decoded type: ${decoded.runtimeType}');
-      
-      // ⚠️ CORRECTION : Si c'est déjà une List, retourner directement
-      if (decoded is List) {
-        print('✅ Response is a List');
-        return decoded;
-      }
-      
-      // Sinon retourner tel quel
-      return decoded;
-      
+      final fullUrl = '$baseUrl$apiVersion$endpoint';
+      print('🌐 PATCH URL construite: $fullUrl');
+      print('📦 PATCH Data: $data');
+
+      final response = await http.patch(
+        Uri.parse(fullUrl),
+        headers: _getHeaders(),
+        body: jsonEncode(data),
+      );
+
+      print('📡 PATCH Response Status: ${response.statusCode}');
+
+      return _handleResponse(response);
     } catch (e) {
-      print('❌ JSON decode error: $e');
-      throw Exception('Erreur de parsing JSON: $e');
-    }
-    
-  } else if (response.statusCode == 401) {
-    throw Exception('Non autorisé - Token invalide ou expiré');
-  } else if (response.statusCode == 404) {
-    throw Exception('Ressource non trouvée');
-  } else {
-    print('❌ Error response: ${response.body}');
-    try {
-      final error = jsonDecode(response.body);
-      if (error is Map && error.containsKey('detail')) {
-        throw Exception(error['detail']);
-      }
-      throw Exception('Erreur ${response.statusCode}: $error');
-    } catch (_) {
-      throw Exception('Erreur ${response.statusCode}: ${response.body}');
+      print('❌ PATCH Error: $e');
+      throw Exception('Erreur PATCH $endpoint: $e');
     }
   }
-}
+
+  dynamic _handleResponse(http.Response response) {
+    print('📡 Status: ${response.statusCode}');
+
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      if (response.body.isEmpty) {
+        print('✅ Empty response body');
+        return {};
+      }
+
+      try {
+        final decoded = jsonDecode(response.body);
+        print('📦 Decoded type: ${decoded.runtimeType}');
+
+        if (decoded is List) {
+          print('✅ Response is a List');
+          return decoded;
+        }
+
+        return decoded;
+
+      } catch (e) {
+        print('❌ JSON decode error: $e');
+        throw Exception('Erreur de parsing JSON: $e');
+      }
+
+    } else if (response.statusCode == 401) {
+      throw Exception('Non autorisé - Token invalide ou expiré');
+    } else if (response.statusCode == 404) {
+      throw Exception('Ressource non trouvée');
+    } else {
+      print('❌ Error response: ${response.body}');
+      try {
+        final error = jsonDecode(response.body);
+        if (error is Map && error.containsKey('detail')) {
+          throw Exception(error['detail']);
+        }
+        throw Exception('Erreur ${response.statusCode}: $error');
+      } catch (_) {
+        throw Exception('Erreur ${response.statusCode}: ${response.body}');
+      }
+    }
+  }
 }

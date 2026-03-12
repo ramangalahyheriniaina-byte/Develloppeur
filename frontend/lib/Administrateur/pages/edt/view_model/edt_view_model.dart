@@ -10,8 +10,8 @@ import '../Model/edtModel.dart';
 
 class EdtViewModel extends ChangeNotifier {
   // ========== SERVICES ==========
-  final EdtService _edtService = EdtService();  // SERVICE pour endpoints EDT
-  final CoursService _coursService = CoursService();  // SERVICE pour endpoints Cours/Classes
+  final EdtService _edtService = EdtService();
+  final CoursService _coursService = CoursService();
 
   // ========== DONNÉES ==========
   Classe? _selectedClasse;
@@ -40,7 +40,6 @@ class EdtViewModel extends ChangeNotifier {
 
   void _initDate() {
     final now = DateTime.now();
-    // Calculer le lundi de la semaine actuelle
     _lundiSemaineSelectionnee = now.subtract(Duration(days: now.weekday - 1));
   }
 
@@ -53,16 +52,12 @@ class EdtViewModel extends ChangeNotifier {
     try {
       print('🔄 Chargement des données EDT...');
 
-      // 1. Charger les classes
       final classesResponse = await _coursService.getAllClasses();
       _classes = classesResponse is List ? classesResponse : [];
 
-      // 2. Charger les cours
       final coursResponse = await _coursService.getAllCours();
       _cours = coursResponse is List ? coursResponse : [];
 
-      // 3. ❌ CORRECTION : getAllSeances() retourne déjà List<Edt>
-      // Plus besoin de conversion !
       _seances = await _edtService.getAllSeances();
 
       print('✅ Données EDT chargées:');
@@ -83,7 +78,7 @@ class EdtViewModel extends ChangeNotifier {
   // ========== GESTION CLASSE ==========
   void changerClasse(Classe classe) {
     _selectedClasse = classe;
-    _coursSelectionne = null; // Reset le cours sélectionné
+    _coursSelectionne = null;
     notifyListeners();
   }
 
@@ -93,19 +88,16 @@ class EdtViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Semaine suivante
   void semaineProchaine() {
     _lundiSemaineSelectionnee = _lundiSemaineSelectionnee.add(const Duration(days: 7));
     notifyListeners();
   }
 
-  // Semaine précédente
   void semainePrecedente() {
     _lundiSemaineSelectionnee = _lundiSemaineSelectionnee.subtract(const Duration(days: 7));
     notifyListeners();
   }
 
-  // Retour à la semaine actuelle
   void retourSemaineActuelle() {
     final now = DateTime.now();
     _lundiSemaineSelectionnee = now.subtract(Duration(days: now.weekday - 1));
@@ -119,8 +111,6 @@ class EdtViewModel extends ChangeNotifier {
   }
 
   // ========== GESTION SÉANCES ==========
-
-  /// Ajouter une séance
   Future<void> ajouterSeance({
     required Cours cours,
     required DateTime dateSeance,
@@ -134,17 +124,14 @@ class EdtViewModel extends ChangeNotifier {
     try {
       print('🔄 Ajout séance pour cours: ${cours.idCours}');
 
-      // Vérifier si cours a un ID
       if (cours.idCours == null) {
         throw Exception('Le cours doit avoir un ID');
       }
 
-      // Vérifier les conflits d'horaire
       if (verifierConflit(dateSeance: dateSeance, heureDebut: heureDebut, heureFin: heureFin)) {
         throw Exception('Conflit d\'horaire détecté');
       }
 
-      // Créer la séance
       final nouvelleSeance = Edt(
         idCours: cours.idCours!,
         dateSeance: dateSeance,
@@ -154,14 +141,10 @@ class EdtViewModel extends ChangeNotifier {
         cours: cours,
       );
 
-      // =================== ENDPOINT BACKEND ===================
-      // 4. ENDPOINT: POST /seances (création d'une séance)
       final seanceCree = await _edtService.createSeance(nouvelleSeance);
-      // ========================================================
-      
-      _seances.add(seanceCree);
 
-      _coursSelectionne = null; // Reset après ajout
+      _seances.add(seanceCree);
+      _coursSelectionne = null;
       _isLoading = false;
 
       print('✅ Séance ajoutée: ${seanceCree.idSeance}');
@@ -174,18 +157,13 @@ class EdtViewModel extends ChangeNotifier {
     }
   }
 
-  /// Supprimer une séance
   Future<void> supprimerSeance(int idSeance) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
 
     try {
-      // =================== ENDPOINT BACKEND ===================
-      // 5. ENDPOINT: DELETE /seances/{idSeance} (suppression)
       await _edtService.deleteSeance(idSeance);
-      // ========================================================
-      
       _seances.removeWhere((s) => s.idSeance == idSeance);
 
       print('✅ Séance supprimée: $idSeance');
@@ -199,36 +177,25 @@ class EdtViewModel extends ChangeNotifier {
     }
   }
 
-  /// Modifier le statut d'une séance
   Future<void> modifierStatut(int idSeance, StatutSeance nouveauStatut) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
 
     try {
-      // Si c'est pour annuler, utiliser annulerSeance
       if (nouveauStatut == StatutSeance.annule) {
-        // =================== ENDPOINT BACKEND ===================
-        // 6. ENDPOINT: POST /seances/{id}/annuler (ou équivalent)
         final seanceUpdate = await _edtService.annulerSeance(idSeance);
-        // ========================================================
 
-        // Mettre à jour localement
         final index = _seances.indexWhere((s) => s.idSeance == idSeance);
         if (index != -1) {
           _seances[index] = seanceUpdate;
         }
       } else {
-        // Pour d'autres statuts, utiliser updateSeance
         final seance = _seances.firstWhere((s) => s.idSeance == idSeance);
         final seanceUpdate = seance.copyWith(statut: nouveauStatut);
 
-        // =================== ENDPOINT BACKEND ===================
-        // 7. ENDPOINT: PUT /seances/{idSeance} (mise à jour)
         await _edtService.updateSeance(idSeance, seanceUpdate);
-        // ========================================================
 
-        // Mettre à jour localement
         final index = _seances.indexWhere((s) => s.idSeance == idSeance);
         if (index != -1) {
           _seances[index] = seanceUpdate;
@@ -247,8 +214,6 @@ class EdtViewModel extends ChangeNotifier {
   }
 
   // ========== RÉCUPÉRATION SÉANCES ==========
-
-  /// Récupérer toutes les séances de la semaine sélectionnée
   List<Edt> seancesDeLaSemaine() {
     final lundi = _lundiSemaineSelectionnee;
     final dimanche = lundi.add(const Duration(days: 6));
@@ -258,7 +223,6 @@ class EdtViewModel extends ChangeNotifier {
           seance.dateSeance.isBefore(dimanche.add(const Duration(days: 1)));
     }).toList();
 
-    // Filtrer par classe si une classe est sélectionnée
     if (_selectedClasse != null) {
       return seancesSemaine.where((seance) {
         return seance.cours?.matiere?.idClasse == _selectedClasse!.idClasse;
@@ -268,37 +232,31 @@ class EdtViewModel extends ChangeNotifier {
     return seancesSemaine;
   }
 
-  /// Récupérer les séances d'un jour spécifique
   List<Edt> seancesDuJour(DateTime date) {
     final seancesJour = _seances.where((seance) =>
     seance.dateSeance.year == date.year &&
         seance.dateSeance.month == date.month &&
         seance.dateSeance.day == date.day).toList();
 
-    // Filtrer par classe si une classe est sélectionnée
     if (_selectedClasse != null) {
       final seancesFiltrees = seancesJour.where((seance) {
         return seance.cours?.matiere?.idClasse == _selectedClasse!.idClasse;
       }).toList();
 
-      // Trier par heure de début
       seancesFiltrees.sort((a, b) => a.heureDebut.compareTo(b.heureDebut));
       return seancesFiltrees;
     }
 
-    // Trier par heure de début
     seancesJour.sort((a, b) => a.heureDebut.compareTo(b.heureDebut));
     return seancesJour;
   }
 
-  /// Récupérer les séances par classe
   List<Edt> seancesParClasse(int idClasse) {
     return _seances.where((seance) {
       return seance.cours?.matiere?.idClasse == idClasse;
     }).toList();
   }
 
-  /// Récupérer les séances d'un cours spécifique
   List<Edt> seancesParCours(int idCours) {
     return _seances.where((seance) {
       return seance.idCours == idCours;
@@ -306,13 +264,10 @@ class EdtViewModel extends ChangeNotifier {
   }
 
   // ========== STATISTIQUES ==========
-
-  /// Nombre de séances dans la semaine
   int nombreSeancesSemaine() {
     return seancesDeLaSemaine().length;
   }
 
-  /// Nombre d'heures total dans la semaine
   double heuresTotalesSemaine() {
     final seances = seancesDeLaSemaine();
     double total = 0.0;
@@ -328,7 +283,6 @@ class EdtViewModel extends ChangeNotifier {
     return total;
   }
 
-  /// Vérifier s'il y a un conflit d'horaire
   bool verifierConflit({
     required DateTime dateSeance,
     required String heureDebut,
@@ -343,18 +297,16 @@ class EdtViewModel extends ChangeNotifier {
       final fin2 = _parseHeureToDateTime(seance.heureFin, dateSeance);
 
       if (debut1 != null && fin1 != null && debut2 != null && fin2 != null) {
-        // Vérifier le chevauchement
         if ((debut1.isBefore(fin2) && fin1.isAfter(debut2))) {
-          return true; // Il y a un conflit
+          return true;
         }
       }
     }
 
-    return false; // Pas de conflit
+    return false;
   }
 
   // ========== HELPERS ==========
-
   TimeOfDay? _parseHeure(String heure) {
     final parts = heure.split(':');
     if (parts.length != 2) return null;
@@ -380,8 +332,6 @@ class EdtViewModel extends ChangeNotifier {
   }
 
   // ========== CHARGEMENT SPÉCIFIQUE ==========
-
-  /// Charger les séances d'une semaine spécifique
   Future<void> chargerSeancesSemaine(DateTime lundi) async {
     _isLoading = true;
     _error = null;
@@ -389,13 +339,9 @@ class EdtViewModel extends ChangeNotifier {
 
     try {
       final dimanche = lundi.add(const Duration(days: 6));
-      
-      // =================== ENDPOINT BACKEND ===================
-      // 8. ENDPOINT: GET /seances?startDate={lundi}&endDate={dimanche}
-      final seancesSemaine = await _edtService.getSeancesByDateRange(lundi, dimanche);
-      // ========================================================
 
-      // Filtrer pour ne garder que les séances de la semaine (au cas où l'API retourne plus)
+      final seancesSemaine = await _edtService.getSeancesByDateRange(lundi, dimanche);
+
       _seances = seancesSemaine.where((seance) {
         return seance.dateSeance.isAfter(lundi.subtract(const Duration(days: 1))) &&
             seance.dateSeance.isBefore(dimanche.add(const Duration(days: 1)));
@@ -410,7 +356,6 @@ class EdtViewModel extends ChangeNotifier {
     }
   }
 
-  /// Charger les séances du jour
   Future<void> chargerSeancesAujourdhui() async {
     _isLoading = true;
     _error = null;
@@ -418,13 +363,9 @@ class EdtViewModel extends ChangeNotifier {
 
     try {
       final aujourdhui = DateTime.now();
-      
-      // =================== ENDPOINT BACKEND ===================
-      // 9. ENDPOINT: GET /seances?date={aujourdhui}
-      final seancesAujourdhui = await _edtService.getSeancesByDate(aujourdhui);
-      // ========================================================
 
-      // Mettre à jour seulement les séances d'aujourd'hui
+      final seancesAujourdhui = await _edtService.getSeancesByDate(aujourdhui);
+
       _seances.removeWhere((s) =>
       s.dateSeance.year == aujourdhui.year &&
           s.dateSeance.month == aujourdhui.month &&
@@ -441,7 +382,6 @@ class EdtViewModel extends ChangeNotifier {
   }
 
   // ========== RÉINITIALISATION ==========
-
   void reset() {
     _seances.clear();
     _selectedClasse = null;
@@ -450,7 +390,6 @@ class EdtViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Reset uniquement les séances (garde la classe sélectionnée)
   void resetSeances() {
     _seances.clear();
     notifyListeners();

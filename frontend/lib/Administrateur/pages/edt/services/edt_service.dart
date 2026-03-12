@@ -1,13 +1,6 @@
 import 'package:apk_web_eduflow/core/services/api_service.dart';
 import '../Model/edtModel.dart';
 import '../../Cours/services/cours_service.dart';
-import '../../Cours/models/cours_model.dart';    // ⚠️ AJOUT
-import '../../Cours/models/matiere_model.dart';  // ⚠️ AJOUT
-import '../../Cours/models/prof_model.dart';     // ⚠️ AJOUT
-import '../../Cours/models/classe_model.dart';   // ⚠️ AJOUT
-
-import 'package:apk_web_eduflow/core/services/api_service.dart';
-import '../Model/edtModel.dart';
 import '../../Cours/models/cours_model.dart';
 import '../../Cours/models/matiere_model.dart';
 import '../../Cours/models/prof_model.dart';
@@ -19,48 +12,45 @@ class EdtService {
   final CoursService _coursService = CoursService();
 
   // ========== SÉANCES ==========
-  // Dans edt_service.dart, méthode getAllSeances() :
+  Future<List<Edt>> getAllSeances() async {
+    try {
+      print('🔄 GET /seances');
+      final response = await _api.get('/seances');
 
-Future<List<Edt>> getAllSeances() async {
-  try {
-    print('🔄 GET /seances');
-    final response = await _api.get('/seances');
-    
-    print('📦 Response type: ${response.runtimeType}');
-    
-    if (response is List) {
-      final List<Edt> seances = [];
-      
-      for (var item in response) {
-        try {
-          if (item is Map<String, dynamic>) {
-            final edt = Edt.fromJson(item);
-            seances.add(edt);
-            
-            // DEBUG
-            print('   Séance ${edt.idSeance}:');
-            print('   - Cours présent: ${edt.cours != null ? "OUI" : "NON"}');
-            print('   - Matière: ${edt.nomMatiere}');
-            print('   - Prof: ${edt.nomProf}');
-            print('   - Classe: ${edt.nomClasse}');
+      print('📦 Response type: ${response.runtimeType}');
+
+      if (response is List) {
+        final List<Edt> seances = [];
+
+        for (var item in response) {
+          try {
+            if (item is Map<String, dynamic>) {
+              final edt = Edt.fromJson(item);
+              seances.add(edt);
+
+              // DEBUG
+              print('   Séance ${edt.idSeance}:');
+              print('   - Cours présent: ${edt.cours != null ? "OUI" : "NON"}');
+              print('   - Matière: ${edt.nomMatiere}');
+              print('   - Prof: ${edt.nomProf}');
+              print('   - Classe: ${edt.nomClasse}');
+            }
+          } catch (e) {
+            print('⚠️ Erreur parsing séance: $e');
           }
-        } catch (e) {
-          print('⚠️ Erreur parsing séance: $e');
         }
-      }
-      
-      print('✅ ${seances.length} séances chargées');
-      return seances;
-    }
-    
-    return [];
-  } catch (e) {
-    print('❌ Erreur getAllSeances: $e');
-    rethrow;
-  }
-}
 
-  // ⚠️ CORRECTION : Méthode pour créer un cours vide
+        print('✅ ${seances.length} séances chargées');
+        return seances;
+      }
+
+      return [];
+    } catch (e) {
+      print('❌ Erreur getAllSeances: $e');
+      rethrow;
+    }
+  }
+
   Cours _creerCoursVide(int coursId) {
     return Cours(
       idCours: coursId,
@@ -73,7 +63,6 @@ Future<List<Edt>> getAllSeances() async {
     );
   }
 
-  // ⚠️ NOUVELLE MÉTHODE : Charger les données des cours pour les séances
   Future<void> _chargerDonneesCoursPourSeances(List<Edt> seances) async {
     try {
       print('🔄 CHARGEMENT COMPLET DES DONNÉES POUR SÉANCES');
@@ -84,7 +73,6 @@ Future<List<Edt>> getAllSeances() async {
         return;
       }
 
-      // 1. COLLECTER TOUS LES IDs DE COURS UNIQUES
       final Set<int> coursIds = {};
       for (var seance in seances) {
         if (seance.idCours != null && seance.idCours > 0) {
@@ -99,7 +87,6 @@ Future<List<Edt>> getAllSeances() async {
         return;
       }
 
-      // 2. CHARGER TOUTES LES DONNÉES NÉCESSAIRES
       print('   🔄 Chargement des cours...');
       final List<Cours> tousLesCours = await _coursService.getAllCours();
 
@@ -118,7 +105,6 @@ Future<List<Edt>> getAllSeances() async {
       print('      - Profs: ${tousProfs.length}');
       print('      - Classes: ${toutesClasses.length}');
 
-      // 3. CRÉER UN MAP POUR FACILITER LES RECHERCHES
       final Map<int, Cours> coursMap = {};
       final Map<int, Matiere> matieresMap = {};
       final Map<int, Prof> profsMap = {};
@@ -148,7 +134,6 @@ Future<List<Edt>> getAllSeances() async {
         }
       }
 
-      // 4. ASSOCIER LES DONNÉES À CHAQUE SÉANCE
       int associations = 0;
 
       for (var i = 0; i < seances.length; i++) {
@@ -159,7 +144,6 @@ Future<List<Edt>> getAllSeances() async {
           continue;
         }
 
-        // A. TROUVER LE COURS
         Cours? cours = coursMap[seance.idCours!];
 
         if (cours == null) {
@@ -167,14 +151,12 @@ Future<List<Edt>> getAllSeances() async {
           cours = _creerCoursVide(seance.idCours!);
         }
 
-        // B. ASSOCIER LA MATIÈRE AU COURS
         if (cours.idMatiere != null && cours.idMatiere! > 0) {
           final matiere = matieresMap[cours.idMatiere!];
 
           if (matiere != null) {
             cours.matiere = matiere;
 
-            // C. ASSOCIER LA CLASSE À LA MATIÈRE
             if (matiere.idClasse != null && matiere.idClasse! > 0) {
               final classe = classesMap[matiere.idClasse!];
               if (classe != null) {
@@ -184,7 +166,6 @@ Future<List<Edt>> getAllSeances() async {
           }
         }
 
-        // D. ASSOCIER LE PROFESSEUR AU COURS
         if (cours.idProf != null && cours.idProf! > 0) {
           final prof = profsMap[cours.idProf!];
           if (prof != null) {
@@ -192,11 +173,9 @@ Future<List<Edt>> getAllSeances() async {
           }
         }
 
-        // E. METTRE À JOUR LA SÉANCE
         seances[i] = seance.copyWith(cours: cours);
         associations++;
 
-        // DEBUG: Afficher ce qui a été trouvé
         print('   ✅ Séance ${seance.idSeance} mise à jour:');
         print('      - Matière: ${cours.matiere?.nomMatiere ?? "Inconnu"}');
         print('      - Prof: ${cours.prof?.nomProf ?? "Inconnu"}');
@@ -213,7 +192,6 @@ Future<List<Edt>> getAllSeances() async {
     }
   }
 
-  // Helper pour parser une liste de séances
   List<Edt> _parseSeancesList(dynamic list) {
     final List<Edt> seances = [];
 
@@ -223,7 +201,6 @@ Future<List<Edt>> getAllSeances() async {
           if (item is Map<String, dynamic>) {
             seances.add(Edt.fromJson(item));
           } else if (item is Map) {
-            // Convertir Map<dynamic, dynamic> en Map<String, dynamic>
             final Map<String, dynamic> jsonMap = {};
             item.forEach((key, value) {
               jsonMap[key.toString()] = value;
@@ -323,7 +300,6 @@ Future<List<Edt>> getAllSeances() async {
       if (response is Map<String, dynamic>) {
         return Edt.fromJson(response);
       } else if (response is Map) {
-        // Convertir
         final Map<String, dynamic> jsonMap = {};
         (response as Map).forEach((key, value) {
           jsonMap[key.toString()] = value;
@@ -348,7 +324,6 @@ Future<List<Edt>> getAllSeances() async {
 
       print('📦 Create response: $response');
 
-      // ⚠️ CORRECTION : Gérer le format de réponse
       Map<String, dynamic> seanceJson;
 
       if (response is Map<String, dynamic>) {
@@ -468,7 +443,6 @@ Future<List<Edt>> getAllSeances() async {
     }
   }
 
-  // Helper pour formater la date
   String _formatDate(DateTime date) {
     return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
   }

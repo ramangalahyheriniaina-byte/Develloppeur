@@ -39,39 +39,50 @@ class _CoursListViewState extends State<CoursListView> {
 
         return Scaffold(
           backgroundColor: const Color(0xFFF5F7FA),
+
+          /// APPBAR FIXE
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            elevation: 1,
+            toolbarHeight: 90,
+            titleSpacing: 24,
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Tableau de Bord de Répartition des Matières',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF1A1F36),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  viewModel.anneeScolaire?.displayName ?? "2026-2027",
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF4A5568),
+                  ),
+                ),
+                Text(
+                  '${viewModel.totalClasses} classes • ${viewModel.totalMatieres} matières',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFF718096),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          /// BODY SCROLLABLE
           body: SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.all(24.0),
+              padding: const EdgeInsets.all(24),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  /// HEADER
-                  const SizedBox(height: 16),
-                  Text(
-                    'Tableau de Bord de Répartition des Matières',
-                    style: TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.w600,
-                      color: Color(0xFF1A1F36),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    viewModel.anneeScolaire?.displayName ?? "2026-2027",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xFF4A5568),
-                    ),
-                  ),
-                  Text(
-                    '${viewModel.totalClasses} classes • ${viewModel.totalMatieres} matières',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Color(0xFF718096),
-                    ),
-                  ),
-                  const SizedBox(height: 32),
 
                   /// STATS ROW
                   Row(
@@ -93,9 +104,10 @@ class _CoursListViewState extends State<CoursListView> {
                       ),
                     ],
                   ),
+
                   const SizedBox(height: 32),
 
-                  /// PROGRAMMES CARDS - En grille 2 colonnes
+                  /// PROGRAMMES
                   LayoutBuilder(
                     builder: (context, constraints) {
                       return Wrap(
@@ -120,7 +132,7 @@ class _CoursListViewState extends State<CoursListView> {
                   /// FOOTER
                   Center(
                     child: Text(
-                      '© Copyright 2026 - 2027 • EduFlow Platform version 2.0.1 • All rights reserved • Contact Support',
+                      '© Copyright ${viewModel.anneeScolaire?.displayName ?? "2026-2027"} • EduFlow Platform version 2.0.1 • All rights reserved • Contact Support',
                       style: TextStyle(
                         fontSize: 12,
                         color: Color(0xFFA0AEC0),
@@ -129,6 +141,7 @@ class _CoursListViewState extends State<CoursListView> {
                       textAlign: TextAlign.center,
                     ),
                   ),
+
                   const SizedBox(height: 24),
                 ],
               ),

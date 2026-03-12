@@ -19,14 +19,14 @@ class DashboardViewModel extends ChangeNotifier {
 
   bool _isLoading = false;
   String? _error;
-  bool _showAllCours = false; // ← NOUVEAU : État pour afficher tous les cours
+  bool _showAllCours = false;
 
   List<Edt> get seances => _seances;
   List<Cours> get cours => _cours;
   bool get isLoading => _isLoading;
   String? get error => _error;
   List<Classe> get classes => _classes;
-  bool get showAllCours => _showAllCours; // ← NOUVEAU : Getter
+  bool get showAllCours => _showAllCours;
 
   // ========== CHARGEMENT DES DONNÉES ==========
   Future<void> loadInitialData() async {
@@ -73,20 +73,17 @@ class DashboardViewModel extends ChangeNotifier {
   }
 
   // ========== ACTIONS POUR AFFICHAGE COURS ==========
-  /// NOUVEAU : Basculer entre "cours en cours" et "tous les cours"
   void toggleShowAllCours() {
     _showAllCours = !_showAllCours;
     print('📊 DashboardVM: Mode showAllCours = $_showAllCours');
     notifyListeners();
   }
 
-  /// NOUVEAU : Réinitialiser à "cours en cours seulement"
   void resetToCoursEnCours() {
     _showAllCours = false;
     notifyListeners();
   }
 
-  /// MODIFIÉ : Cours d'aujourd'hui avec filtre selon le mode
   List<DashboardModel> getCoursAujourdhuiFiltered() {
     final maintenant = DateTime.now();
     final aujourdhui = DateTime(maintenant.year, maintenant.month, maintenant.day);
@@ -119,7 +116,6 @@ class DashboardViewModel extends ChangeNotifier {
     return models;
   }
 
-  /// ANCIENNE MÉTHODE (gardée pour compatibilité)
   List<DashboardModel> getAllCoursAujourdhui() {
     final maintenant = DateTime.now();
     final aujourdhui = DateTime(maintenant.year, maintenant.month, maintenant.day);
@@ -151,22 +147,17 @@ class DashboardViewModel extends ChangeNotifier {
     print('🔄 DashboardVM: Annulation séance ${dm.seance.idSeance}...');
 
     try {
-      // 1. Appeler l'API
       final updatedSeance = await _edtService.annulerSeance(dm.seance.idSeance!);
       print('✅ DashboardVM: API - Séance annulée avec succès');
 
-      // 2. Mettre à jour LOCALEMENT immédiatement
       final index = _seances.indexWhere((s) => s.idSeance == dm.seance.idSeance);
       if (index != -1) {
         _seances[index] = updatedSeance;
         print('📊 DashboardVM: Mise à jour locale - index $index');
         notifyListeners();
 
-        // 3. Attendre un peu et recharger pour synchronisation
         await Future.delayed(const Duration(milliseconds: 300));
         await loadInitialData();
-      } else {
-        print('⚠️ DashboardVM: Séance non trouvée dans la liste locale');
       }
 
       _isLoading = false;
@@ -198,7 +189,6 @@ class DashboardViewModel extends ChangeNotifier {
 
       print('✅ DashboardVM: API - Séance marquée en cours');
 
-      // Mettre à jour localement
       final index = _seances.indexWhere((s) => s.idSeance == dm.seance.idSeance);
       if (index != -1) {
         _seances[index] = updatedSeance;
@@ -238,7 +228,6 @@ class DashboardViewModel extends ChangeNotifier {
 
       print('✅ DashboardVM: API - Séance terminée');
 
-      // Mettre à jour localement
       final index = _seances.indexWhere((s) => s.idSeance == dm.seance.idSeance);
       if (index != -1) {
         _seances[index] = updatedSeance;
@@ -320,15 +309,4 @@ class AvancementCours {
     required this.progression,
     required this.couleur,
   });
-}
-
-/// Helper class pour représenter une heure
-class TimeOfDay {
-  final int hour;
-  final int minute;
-
-  TimeOfDay({required this.hour, required this.minute});
-
-  @override
-  String toString() => '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
 }

@@ -1,0 +1,232 @@
+[
+  {
+    "ues": [
+      {
+        "ue_name": "Fondamentaux des Systèmes Informatiques",
+        "total_hours": 45,
+        "lessons": [
+          {
+            "lesson_name": "Histoire et Évolution de l'Informatique",
+            "objective": "Comprendre les grandes étapes de l'informatique et son impact.",
+            "duration_hours": 3,
+            "type": "theorie"
+          },
+          {
+            "lesson_name": "Architecture Matérielle d'un Ordinateur",
+            "objective": "Identifier et comprendre le rôle des composants essentiels d'un ordinateur (CPU, RAM, Stockage).",
+            "duration_hours": 9,
+            "type": "theorie"
+          },
+          {
+            "lesson_name": "Principes et Rôles des Systèmes d'Exploitation Modernes",
+            "objective": "Saisir le rôle, les fonctions et les types de systèmes d'exploitation contemporains (Windows, Linux, macOS).",
+            "duration_hours": 6,
+            "type": "theorie"
+          },
+          {
+            "lesson_name": "Gestion du Système de Fichiers",
+            "objective": "Maîtriser l'organisation, la manipulation des fichiers et répertoires et la gestion des permissions.",
+            "duration_hours": 9,
+            "type": "pratique"
+          },
+          {
+            "lesson_name": "Initiation à la Ligne de Commande (Bash/PowerShell)",
+            "objective": "Utiliser les commandes de base d'une interface en ligne pour interagir avec le système.",
+            "duration_hours": 9,
+            "type": "pratique"
+          },
+          {
+            "lesson_name": "Réseaux et Internet : Concepts de Base",
+            "objective": "Comprendre les principes fondamentaux du fonctionnement des réseaux, d'Internet et des protocoles essentiels (IP, DNS).",
+            "duration_hours": 6,
+            "type": "theorie"
+          },
+          {
+            "lesson_name": "Sécurité Informatique : Principes Fondamentaux",
+            "objective": "Acquérir les bases de la sécurité numérique, des menaces courantes et de la protection des données.",
+            "duration_hours": 3,
+            "type": "theorie"
+          }
+        ]
+      },
+      {
+        "ue_name": "Bureautique et Compétences Numériques",
+        "total_hours": 45,
+        "lessons": [
+          {
+            "lesson_name": "Traitement de Texte (MS Word / LibreOffice Writer)",
+            "objective": "Produire des documents professionnels complexes, structurés et mis en forme.",
+            "duration_hours": 9,
+            "type": "pratique"
+          },
+          {
+            "lesson_name": "Tableurs (MS Excel / LibreOffice Calc)",
+            "objective": "Maîtriser les fonctionnalités avancées des tableurs pour l'analyse de données, les formules et fonctions.",
+            "duration_hours": 12,
+            "type": "pratique"
+          },
+          {
+            "lesson_name": "Présentation (MS PowerPoint / LibreOffice Impress)",
+            "objective": "Concevoir et réaliser des présentations percutantes et professionnelles.",
+            "duration_hours": 6,
+            "type": "pratique"
+          },
+          {
+            "lesson_name": "Gestion de Projets Simples et Collaboration (Outils Cloud)",
+            "objective": "Collaborer efficacement sur des projets en utilisant des outils bureautiques et de stockage en ligne.",
+            "duration_hours": 6,
+            "type": "pratique"
+          },
+          {
+            "lesson_name": "Communication Professionnelle Digitale (Email, Calendrier, Visio)",
+            "objective": "Utiliser les outils de communication numérique de manière efficace et professionnelle.",
+            "duration_hours": 6,
+            "type": "pratique"
+          },
+          {
+            "lesson_name": "Recherche d'Information et Éthique du Web",
+            "objective": "Développer des compétences de recherche critique et comprendre les enjeux éthiques et de confidentialité sur le web.",
+            "duration_hours": 6,
+            "type": "theorie"
+          }
+        ]
+      },
+      {
+        "ue_name": "Introduction à la Programmation (Python)",
+        "total_hours": 60,
+        "lessons": [
+          {
+            "lesson_name": "Découverte de la Programmation et de Python",
+            "objective": "Comprendre les concepts fondamentaux de la programmation et s'initier à l'environnement Python.",
+            "duration_hours": 3,
+            "type": "theorie"
+          },
+          {
+            "lesson_name": "Variables, Types de Données et Opérateurs",
+            "objective": "Déclarer, manipuler des variables avec différents types de données et utiliser les opérateurs de base.",
+            "duration_hours": 9,
+            "type": "pratique"
+          },
+          {
+            "lesson_name": "Structures Conditionnelles (If/Else, Elif)",
+            "objective": "Implémenter des logiques de décision et de branchement dans les programmes.",
+            "duration_hours": 9,
+            "type": "pratique"
+          },
+          {
+            "lesson_name": "Boucles (For, While)",
+            "objective": "Automatiser les tâches répétitives et itérer sur des collections de données.",
+            "duration_hours": 9,
+            "type": "pratique"
+          },
+          {
+            "lesson_name": "Fonctions : Définition, Appel, Paramètres",
+            "objective": "Organiser le code en fonctions réutilisables et maîtriser le passage de paramètres.",
+            "duration_hours": 9,
+            "type": "pratique"
+          },
+          {
+            "lesson_name": "Structures de Données : Listes et Tuples",
+            "objective": "Manipuler des collections ordonnées et indexées de données (listes, tuples).",
+            "duration_hours": 9,
+            "type": "pratique"
+          },
+          {
+            "lesson_name": "Structures de Données : Dictionnaires et Ensembles",
+            "objective": "Gérer des collections non ordonnées et des paires clé-valeur (dictionnaires, ensembles).",
+            "duration_hours": 6,
+            "type": "pratique"
+          },
+          {
+            "lesson_name": "Gestion des Fichiers (Lecture/Écriture)",
+            "objective": "Interagir avec le système de fichiers pour lire et écrire des données textuelles.",
+            "duration_hours": 6,
+            "type": "pratique"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "ues": [
+      {
+        "ue_name": "Fondamentaux HTML & CSS",
+        "total_hours": 30,
+        "lessons": [
+          {
+            "lesson_name": "Introduction au Web et à HTML",
+            "objective": "Comprendre les principes du web et structurer le contenu avec les balises HTML de base (structure du document, titres, paragraphes).",
+            "duration_hours": 3,
+            "type": "theorie/pratique"
+          },
+          {
+            "lesson_name": "Structuration Sémantique avec HTML5",
+            "objective": "Utiliser les balises sémantiques de HTML5 pour organiser le contenu de manière claire et accessible (header, nav, main, article, section, footer, listes).",
+            "duration_hours": 4,
+            "type": "theorie/pratique"
+          },
+          {
+            "lesson_name": "Liens Hypertextes et Images",
+            "objective": "Savoir insérer des liens (internes, externes) et des images dans une page web, en maîtrisant les attributs essentiels (src, alt, href, target).",
+            "duration_hours": 3,
+            "type": "theorie/pratique"
+          },
+          {
+            "lesson_name": "Tableaux pour Données et Formulaires de Base",
+            "objective": "Créer des tableaux pour afficher des données structurées et concevoir des formulaires simples pour l'interaction utilisateur.",
+            "duration_hours": 4,
+            "type": "theorie/pratique"
+          },
+          {
+            "lesson_name": "Introduction au CSS et Sélecteurs",
+            "objective": "Découvrir le rôle du CSS pour le style des pages web, comprendre les différentes méthodes d'intégration et maîtriser les sélecteurs de base (type, classe, ID).",
+            "duration_hours": 6,
+            "type": "theorie/pratique"
+          },
+          {
+            "lesson_name": "Le Modèle de Boîte CSS",
+            "objective": "Appliquer le modèle de boîte (margin, border, padding, content) pour contrôler l'espacement et la taille des éléments sur une page.",
+            "duration_hours": 4,
+            "type": "theorie/pratique"
+          },
+          {
+            "lesson_name": "Disposition Simple avec Flexbox",
+            "objective": "Utiliser les bases de Flexbox pour organiser les éléments de manière flexible et créer des mises en page réactives simples.",
+            "duration_hours": 6,
+            "type": "theorie/pratique"
+          }
+        ]
+      },
+      {
+        "ue_name": "Projet de Développement Web Statique",
+        "total_hours": 24,
+        "lessons": [
+          {
+            "lesson_name": "Analyse du Besoin et Conception (Wireframing)",
+            "objective": "Analyser un cahier des charges simple et concevoir la structure d'une page web via des wireframes (schémas de page).",
+            "duration_hours": 3,
+            "type": "projet"
+          },
+          {
+            "lesson_name": "Développement de la Structure HTML",
+            "objective": "Traduire les wireframes en une structure HTML sémantique et valide, en respectant les bonnes pratiques.",
+            "duration_hours": 6,
+            "type": "projet"
+          },
+          {
+            "lesson_name": "Stylisation et Mise en Page CSS",
+            "objective": "Appliquer les styles CSS pour donner vie au design, en utilisant le modèle de boîte et Flexbox pour la mise en page.",
+            "duration_hours": 9,
+            "type": "projet"
+          },
+          {
+            "lesson_name": "Révision, Optimisation et Déploiement",
+            "objective": "Réviser le code, optimiser les ressources (images, CSS) et déployer la page web statique sur une plateforme simple (ex: GitHub Pages).",
+            "duration_hours": 6,
+            "type": "projet"
+          }
+        ]
+      }
+    ]
+  }
+]
